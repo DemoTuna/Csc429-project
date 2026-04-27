@@ -1,0 +1,277 @@
+/* 
+    style.css — Global Stylesheet
+    Applied to all pages: Login, Register, and Dashboard
+*/
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+        Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #f1f5f9;
+    color: #1e293b;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    /* stack header, main, footer vertically */
+}
+
+
+.site-header {
+    background: linear-gradient(135deg, #80548f 0%, #a588ae 100%);
+    color: #ffffff;
+    text-align: center;
+    padding: 18px 24px;
+    box-shadow: 0 2px 10px rgba(136, 63, 224, 0.35);
+}
+
+.site-header h1 {
+    font-size: 1.45rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+
+.site-header p {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    margin-top: 4px;
+}
+
+
+main {
+    flex: 1;
+    /* take up all remaining vertical space */
+    display: flex;
+    align-items: center;
+    /* vertical center */
+    justify-content: center;
+    /* horizontal center */
+    padding: 40px 20px;
+}
+
+
+.card {
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 4px 28px rgba(0, 0, 0, 0.09);
+    padding: 42px 38px;
+    width: 100%;
+    max-width: 420px;
+}
+
+.card h2 {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 6px;
+}
+
+.card .subtitle {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-bottom: 28px;
+}
+
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #1e293b;
+    background: #f8fafc;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.form-group input:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.13);
+    background: #ffffff;
+}
+
+
+
+.btn {
+    display: block;
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+/* Primary button — main CTA (Sign In / Create Account) */
+.btn-primary {
+    background: linear-gradient(135deg, #80548f 0%, #a588ae 100%);
+    color: #ffffff;
+    margin-top: 8px;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #80548f 0%, #a588ae 100%);
+    box-shadow: 0 4px 14px rgba(136, 63, 224, 0.35);
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: #ffffff;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+    box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3);
+}
+
+
+.alert {
+    padding: 11px 14px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+.alert-error {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+.alert-success {
+    background: #f0fdf4;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+
+
+.divider {
+    text-align: center;
+    margin-top: 22px;
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.divider a {
+    color: #9868a8;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.divider a:hover {
+    text-decoration: underline;
+}
+
+
+.dashboard-card {
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 4px 28px rgba(0, 0, 0, 0.09);
+    padding: 42px 40px;
+    width: 100%;
+    max-width: 580px;
+}
+
+.dashboard-card h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 6px;
+}
+
+.dashboard-card .welcome-msg {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 30px;
+}
+
+
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+
+.info-table tr {
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.info-table tr:last-child {
+    border-bottom: none;
+}
+
+.info-table td {
+    padding: 13px 6px;
+    font-size: 0.9rem;
+}
+
+.info-table td:first-child {
+    color: #64748b;
+    font-weight: 500;
+    width: 130px;
+}
+
+.info-table td:last-child {
+    color: #1e293b;
+    font-weight: 600;
+}
+
+/* ROLE BADGE */
+.role-badge {
+    display: inline-block;
+    padding: 3px 11px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+
+/* Standard user role */
+.role-user {
+    background: #ede9fe;
+    color: #5b21b6;
+}
+
+/* Admin role  */
+.role-admin {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+
+.site-footer {
+    text-align: center;
+    padding: 16px;
+    font-size: 0.78rem;
+    color: #94a3b8;
+    border-top: 1px solid #e2e8f0;
+    background: #ffffff;
+}
