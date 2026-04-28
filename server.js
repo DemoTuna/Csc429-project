@@ -87,10 +87,15 @@ app.post('/login', async (req, res) => { // When user submits login form then ru
 
     try {
         // Look up the user by username and password in the database
-        const rows = await db.query(sql`
-            SELECT * FROM users
-            WHERE username = ${username} AND password = ${password}
-        `);
+        // Vulnerable query! (not secure)
+        // User input is directly concatenated into the SQL string
+        // This allows attackers to inject SQL (SQL Injection attack) by setting the username to somthing like this( ' OR 1=1 -- )
+        const query = "SELECT * FROM users WHERE username = '" + username + "' AND password = '" + password + "'";
+
+
+        // we are using __dangerous__rawValue to disables built-in protection
+        // It forces the database to execute the raw query as-is to bypasses parameterized query safety and makes injection possible
+        const rows = await db.query(sql.__dangerous__rawValue(query));
 
         const user = rows[0]; // Get the first (and only) matching user
 
