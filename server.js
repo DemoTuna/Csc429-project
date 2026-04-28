@@ -21,6 +21,7 @@ const PORT = 3000;
 // These help Express read form data, JSON data, and CSS files 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 
@@ -48,6 +49,15 @@ function requireLogin(req, res, next) {
 }
 
 
+function requireAdmin(req, res, next) {
+    if (req.session && req.session.user && req.session.user.role === 'admin') {
+        next(); // allow
+    } else {
+        res.status(403).sendFile(path.join(__dirname, 'views', 'access-denied.html'));
+    }
+}
+
+
 // same as requireLogin but used for API requests (returns error instead of redirect)
 // used when the page is asking for data (API request, not opening a page)
 function requireLoginAPI(req, res, next) {
@@ -60,7 +70,9 @@ function requireLoginAPI(req, res, next) {
 
 
 // Each route handles a specific URL path and HTTP method
-
+app.get('/admin', requireLogin, requireAdmin, (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'admin.html'));
+});
 
 // GET /  (which is HOME) then redirect to login
 app.get('/', (req, res) => {
@@ -172,6 +184,36 @@ app.get('/dashboard', requireLogin, (req, res) => {
 // Called by dashboard.html via JavaScript fetch() to populate the UI // so it is not a page it is for javaScript inside dashboarde
 app.get('/api/user', requireLoginAPI, (req, res) => {
     res.json(req.session.user);
+});
+
+app.get('/api/users', requireLogin, requireAdmin, async (req, res) => {
+    try {
+        const users = await db.query(sql`
+            SELECT username, email, role FROM users
+        `);
+        res.json(users);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to fetch users' });
+    }
+});
+
+app.post('/api/delete-user', requireLogin, requireAdmin, async (req, res) => {
+    try {
+        const username = req.body.username;
+
+        if (username === 'admin') {
+            return res.json({ message: 'Cannot delete admin' });
+        }
+
+        await db.query(sql`
+            DELETE FROM users WHERE username = ${username}
+        `);
+
+        res.json({ message: 'User deleted successfully' });
+
+    } catch (err) {
+        res.status(500).json({ message: 'Error deleting user' });
+    }
 });
 
 

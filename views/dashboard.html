@@ -57,6 +57,8 @@
                 </tbody>
             </table>
 
+
+            <div id="admin-link"></div>
             <!-- Logout button — hits GET /logout on the server -->
             <a href="/logout" class="btn btn-danger">Sign Out</a>
 
@@ -99,6 +101,10 @@
                 // Render the role as a styled badge
                 // admin → gold badge   |   user → purple badge
                 var roleEl = document.getElementById('user-role');
+                if (user.role === 'admin') {
+    document.getElementById('admin-link').innerHTML =
+        '<a href="/admin" class="btn btn-primary">Go to Admin Page</a>';
+}
                 var roleClass = user.role === 'admin' ? 'role-admin' : 'role-user';
                 roleEl.innerHTML =
                     '<span class="role-badge ' + roleClass + '">' + user.role + '</span>'; // so admin and user get different styling
