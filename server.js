@@ -15,7 +15,7 @@ const session = require('express-session'); // remembers the user after login
 const path = require('path'); //  helps find files like html pages
 const https = require('https'); // to create HTTPS server for encrypted communication
 const fs = require('fs'); // reads certificate files (key.pem and cert.pem)
-
+const bcrypt = require('bcrypt'); // Import bcrypt library for secure password hashing
 // Import the database connection and the setup function initDatabase() from database.js
 const { db, sql, initDatabase } = require('./database');
 
@@ -103,20 +103,21 @@ app.post('/login', async (req, res) => { // When user submits login form then ru
     const { username, password } = req.body; // get data from the form 
 
     try {
-        // Look up the user by username and password in the database
-        // Vulnerable query! (not secure)
-        // User input is directly concatenated into the SQL string
-        // This allows attackers to inject SQL (SQL Injection attack) by setting the username to somthing like this( ' OR 1=1 -- )
-        const query = "SELECT * FROM users WHERE username = '" + username + "' AND password = '" + password + "'";
 
-
-        // we are using __dangerous__rawValue to disables built-in protection
-        // It forces the database to execute the raw query as-is to bypasses parameterized query safety and makes injection possible
-        const rows = await db.query(sql.__dangerous__rawValue(query));
+        // Look up the user by username only
+        const rows = await db.query(sql`
+            SELECT * FROM users
+            WHERE username = ${username}
+        `);
 
         const user = rows[0]; // Get the first (and only) matching user
 
-        if (user) { // if it exists then
+
+        // Compare the entered password with the hashed password in the database
+        // bcrypt.compare returns true only if they match
+        const passwordMatches = user && await bcrypt.compare(password, user.password);
+
+        if (passwordMatches) {
 
             // Save user info in the session (we never store the password)
             req.session.user = {
@@ -140,7 +141,6 @@ app.post('/login', async (req, res) => { // When user submits login form then ru
 });
 
 
-
 // GET /register then Show the registration page
 app.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'register.html'));
@@ -162,10 +162,15 @@ app.post('/register', async (req, res) => {
             return res.redirect('/register?error=Username+or+email+is+already+taken');
         }
 
+        // Hash the password before saving it (more secure than plain text)
+        // NOTE: previously passwords were stored in plain text (weak security)
+        // Now passwords are securely hashed using bcrypt before storage
+        const hashedPassword = await bcrypt.hash(password, 10);
+
         // Insert the new user and role is locked to 'user', not from form input ( we do not want user to decide his\her role)
         await db.query(sql`
             INSERT INTO users (full_name, email, username, password, role)
-            VALUES (${full_name}, ${email}, ${username}, ${password}, 'user')
+            VALUES (${full_name}, ${email}, ${username}, ${hashedPassword}, 'user')
         `);
 
         // Redirect to login with a success message

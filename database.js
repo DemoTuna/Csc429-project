@@ -9,7 +9,7 @@ const createDatabase = require('@databases/sqlite');
 const { sql } = require('@databases/sqlite'); // { sql } means only give me the sql part
 const path = require('path');
 const fs = require('fs');
-
+const bcrypt = require('bcrypt'); // Import bcrypt library for secure password hashing
 // Make sure the database folder exists before saving app.db inside it
 const dbDir = path.join(__dirname, 'database');
 if (!fs.existsSync(dbDir)) {
@@ -41,9 +41,12 @@ async function initDatabase() {
     `);
     // if it does not exists admin will be added manually
     if (existing.length === 0) {
+        // Hash the default admin password before inserting
+        const adminHashedPassword = await bcrypt.hash('admin123', 10);
+
         await db.query(sql`
-            INSERT INTO users (full_name, email, username, password, role)
-            VALUES ('Admin User', 'admin@example.com', 'admin', 'admin123', 'admin')
+        INSERT INTO users (full_name, email, username, password, role)
+        VALUES ('Admin User', 'admin@example.com', 'admin', ${adminHashedPassword}, 'admin')
         `);
     }
 }
