@@ -79,7 +79,8 @@ The application initially includes the following vulnerabilities:
 
 - Node.js  
 - Express.js  
-- SQLite  
+- SQLite
+- bcrypt  
 - HTML  
 - CSS  
 - JavaScript  
