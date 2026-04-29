@@ -6,10 +6,15 @@
 - handles register, login, dashboard, and logout
 */
 
+// Load environment variables from .env file (for session key)
+require('dotenv').config();
+
 // Import the tools needed for the server and session and paths 
 const express = require('express'); // helps us build the web app (routes, pages, server
 const session = require('express-session'); // remembers the user after login
 const path = require('path'); //  helps find files like html pages
+const https = require('https'); // to create HTTPS server for encrypted communication
+const fs = require('fs'); // reads certificate files (key.pem and cert.pem)
 
 // Import the database connection and the setup function initDatabase() from database.js
 const { db, sql, initDatabase } = require('./database');
@@ -27,7 +32,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Session is used to remember the user after login
 app.use(session({
-    secret: 'csc429-session-secret-key',     // secret key used to protect session data (like a password for sessions)
+    secret: process.env.SESSION_SECRET,     // secret key used to protect session data (like a password for sessions)
     resave: false,                          // don’t save session again if nothing changed 
     saveUninitialized: false,              // don’t create session until user actually logs in
     cookie: {
@@ -231,8 +236,11 @@ app.get('/logout', (req, res) => {
     try {
         await initDatabase(); // Set up tables and add admin user
 
-        app.listen(PORT, () => {
-            console.log(`Server running at : http://localhost:${PORT}`);
+        https.createServer({
+            key: fs.readFileSync('key.pem'),
+            cert: fs.readFileSync('cert.pem')
+        }, app).listen(PORT, () => {
+            console.log(`Server running at : https://localhost:${PORT}`);
         });
 
     } catch (err) {

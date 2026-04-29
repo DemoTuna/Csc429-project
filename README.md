@@ -70,8 +70,8 @@ The application initially includes the following vulnerabilities:
   - Role-Based Access Control (RBAC) added  
 
 - Encryption
-  - Sensitive data protected (passwords, sessions)  
-  - Secure communication (HTTPS concept applied)  
+  - Sensitive data protected (session secret stored in environment variables)  
+  - Secure communication (HTTPS implemented via self-signed certificate)  
 
 ---
 
@@ -98,10 +98,13 @@ Follow these steps to run the project locally:
 3. Install the required dependencies:  
    npm install
 
-4. Start the server:  
+4. Create a .env file in the root directory containing only:
+  SESSION_SECRET=your_random_secret_here
+
+5. Start the server:  
    npm start
 
-5. Open your browser and go to:  
-   http://localhost:3000
+6. Open your browser and go to:  
+   https://localhost:3000
 
 The application should now be running.
