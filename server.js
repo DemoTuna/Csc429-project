@@ -72,7 +72,14 @@ function requireLoginAPI(req, res, next) {
         res.status(401).json({ error: 'Not authenticated' });
     }
 }
+function sanitizeInput(input) {
+    let clean = input.replace(/<[^>]*>/g, '');
+    clean = clean.replace(/on\w+\s*=\s*["']?[^"']*["']?/gi, '');
+    clean = clean.replace(/javascript:/gi, '');
+    clean = clean.replace(/[<>]/g, '');
 
+    return clean;
+}
 
 // Each route handles a specific URL path and HTTP method
 app.get('/admin', requireLogin, requireAdmin, (req, res) => {
@@ -234,6 +241,56 @@ app.get('/logout', (req, res) => {
         res.redirect('/login');
     });
 });
+// GET /comments — show the comments page (protected)
+app.get('/comments', requireLogin, (req, res) => {
+    res.sendFile(path.join(__dirname, 'views', 'comments.html'));
+});
+
+// GET /api/comments — fetch all comments from database
+app.get('/api/comments', requireLogin, async (req, res) => {
+    try {
+        const rows = await db.query(sql`SELECT id, username, comment FROM comments`)
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to fetch comments' });
+    }
+});
+
+// POST /api/comments — save a new comment after sanatize it.
+app.post('/api/comments', requireLogin, async (req, res) => {
+    try {
+        const { comment } = req.body;
+        const username = req.session.user.username;
+        const cleanComment = sanitizeInput(comment);
+        await db.query(sql`
+            INSERT INTO comments (username, comment)
+            VALUES (${username}, ${cleanComment})
+        `);
+
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false });
+    }
+});
+app.post('/api/delete-comment', requireLogin, async (req, res) => {
+    try {
+        const { id } = req.body;
+        const username = req.session.user.username;
+        const role = req.session.user.role;
+
+        // Only allow admin or the comment owner to delete
+        if (role === 'admin') {
+            await db.query(sql`DELETE FROM comments WHERE id = ${id}`);
+        } else {
+            await db.query(sql`DELETE FROM comments WHERE id = ${id} AND username = ${username}`);
+        }
+
+        res.json({ success: true });
+    } catch (err) {
+        res.status(500).json({ success: false });
+    }
+});
+
 
 // INITIALIZE DATABASE, THEN START THE SERVER
 // We must wait for the database to be ready before accepting

@@ -34,6 +34,13 @@ async function initDatabase() {
             role      TEXT    NOT NULL DEFAULT 'user'
         )
     `);
+    await db.query(sql`
+        CREATE TABLE IF NOT EXISTS comments (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
+            comment TEXT
+        )
+    `);
 
     // Check if the default admin account already exists
     const existing = await db.query(sql`

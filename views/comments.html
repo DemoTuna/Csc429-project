@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comments — SecureApp</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+    <!-- SITE HEADER -->
+    <header class="site-header">
+        <h1>Secure Login System</h1>
+        <p>CSC429 Project</p>
+    </header>
+
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="dashboard-card">
+
+            <h2>Comments</h2>
+            
+
+
+            <!-- COMMENT FORM -->
+            <table class="info-table">
+                <tbody>
+                    <tr>
+                        <td>Your Comment</td>
+                        <td>
+                            <textarea id="comment-input" rows="3"
+                                style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc; font-size:14px;"
+                                placeholder='Try typing an XSS payload here'></textarea>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Submit button -->
+            <button class="btn btn-primary" onclick="postComment()">Post Comment</button>
+
+            <!-- Error/success message -->
+            <p id="form-msg" style="margin-top: 10px; font-size: 14px;"></p>
+
+            <hr style="margin: 24px 0;">
+
+            <h3 style="margin-bottom: 12px;">All Comments</h3>
+
+            <!-- Comments will be loaded here by JS -->
+            <div id="comments-list">
+                <p style="color:#888;">Loading comments&hellip;</p>
+            </div>
+
+
+            <!-- Navigation buttons -->
+            <div style="margin-top: 24px; display: flex; gap: 12px;">
+                <a href="/dashboard" class="btn btn-primary">Back to Dashboard</a>
+                <a href="/logout" class="btn btn-danger">Sign Out</a>
+            </div>
+
+        </div>
+    </main>
+
+
+    <!-- SITE FOOTER -->
+    <footer class="site-footer">
+        CSC429 Project
+    </footer>
+
+    <script>
+        function escapeHTML(str) {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+
+        function loadComments() {
+            fetch('/api/comments')
+                .then(function (res) {
+                    if (!res.ok) {
+                        window.location.href = '/login';
+                        return null;
+                    }
+                    return res.json();
+                })
+                .then(function (comments) {
+                    if (!comments) return;
+
+                    var container = document.getElementById('comments-list');
+
+                    if (comments.length === 0) {
+                        container.innerHTML = '<p style="color:#888;">No comments yet. Be the first!</p>';
+                        return;
+                    }
+
+                    
+                    var html = '';
+                    comments.forEach(function (row) {
+                        html += '<table class="info-table" style="margin-bottom:10px;"><tbody>';
+                        html += '<tr><td style="width:120px;"><strong>' + escapeHTML(row.username) + '</strong></td>';
+                        html += '<td>' + escapeHTML(row.comment) + '</td>';
+                        html += '<td><button class="btn btn-danger" onclick="deleteComment(' + row.id + ')">Delete</button></td>';
+                        html += '</tr></tbody></table>';
+                    });
+
+                    container.innerHTML = html;
+
+                })
+                .catch(function (err) {
+                    console.error('Failed to load comments:', err);
+                });
+        }
+
+
+        function postComment() {
+            var comment = document.getElementById('comment-input').value.trim();
+            var msgEl = document.getElementById('form-msg');
+
+            if (!comment) {
+                msgEl.style.color = 'red';
+                msgEl.textContent = 'Please write a comment before posting.';
+                return;
+            }
+
+            fetch('/api/comments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ comment: comment })
+            })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    if (data.success) {
+                        document.getElementById('comment-input').value = '';
+                        msgEl.style.color = 'green';
+                        msgEl.textContent = 'Comment posted!';
+                        loadComments();
+                    } else {
+                        msgEl.style.color = 'red';
+                        msgEl.textContent = 'Failed to post comment.';
+                    }
+                })
+                .catch(function () {
+                    msgEl.style.color = 'red';
+                    msgEl.textContent = 'Something went wrong.';
+                });
+        }
+        function deleteComment(id) {
+            fetch('/api/delete-comment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id })
+            })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    if (data.success) {
+                        loadComments(); // refresh the list
+                    }
+                })
+                .catch(function () {
+                    alert('Failed to delete comment.');
+                });
+        }
+
+
+        // Load comments when page opens
+        loadComments();
+
+    </script>
+
+</body>
+
+</html>
