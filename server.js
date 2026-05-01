@@ -73,10 +73,37 @@ function requireLoginAPI(req, res, next) {
     }
 }
 function sanitizeInput(input) {
-    let clean = input.replace(/<[^>]*>/g, '');
-    clean = clean.replace(/on\w+\s*=\s*["']?[^"']*["']?/gi, '');
-    clean = clean.replace(/javascript:/gi, '');
+
+    // Step 1: Decode HTML entities first to catch encoded attacks
+    // This converts &#x3C; back to < before we sanitize
+    let clean = input
+        .replace(/&lt;/gi, '<')
+        .replace(/&gt;/gi, '>')
+        .replace(/&amp;/gi, '&')
+        .replace(/&#x3C;/gi, '<')
+        .replace(/&#x3E;/gi, '>')
+        .replace(/&#(\d+);/gi, function (match, dec) {
+            return String.fromCharCode(dec);
+        })
+        .replace(/&#x([0-9a-f]+);/gi, function (match, hex) {
+            return String.fromCharCode(parseInt(hex, 16));
+        });
+
+    // Step 2: Remove all HTML tags (handles line breaks inside tags using [\s\S])
+    clean = clean.replace(/<[\s\S]*?>/gi, '');
+
+    // Step 3: Remove event handlers even without quotes and across line breaks
+    clean = clean.replace(/on\w+[\s\S]*?=[\s\S]*?(['"]?[^'"]*['"]?)/gi, '');
+
+    // Step 4: Remove javascript: and data: URIs
+    clean = clean.replace(/javascript\s*:/gi, '');
+    clean = clean.replace(/data\s*:/gi, '');
+
+    // Step 5: Remove any leftover < > characters
     clean = clean.replace(/[<>]/g, '');
+
+    // Step 6: Trim extra whitespace left behind
+    clean = clean.trim();
 
     return clean;
 }
