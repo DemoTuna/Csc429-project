@@ -94,7 +94,7 @@ Follow these steps to run the project locally:
 1. Download or clone the repository:  
    git clone <your-repo-url>
 
-2. Open the project folder in your preferred code editor.
+2. Choose which version of the project you want to see, then open that version folder in your code editor.
 
 3. Install the required dependencies:  
    npm install

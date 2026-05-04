@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — SecureApp</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+    <!-- SITE HEADER -->
+    <header class="site-header">
+        <h1>Secure Login System</h1>
+        <p>CSC429 Project</p>
+    </header>
+
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="dashboard-card">
+
+            <h2>My Dashboard</h2>
+
+            <!-- Welcome message and it is updated dynamically by JS below -->
+            <p class="welcome-msg" id="welcome-msg">Loading your profile&hellip;</p>
+
+
+            <!-- USER INFO TABLE
+                 All cells start empty and are filled in by the JavaScript fetch() call at the bottom of
+                 this file once the user data arrives from the server -->
+            <table class="info-table">
+                <tbody>
+
+                    <tr>
+                        <td>Full Name</td>
+                        <td id="user-fullname">&mdash;</td>
+                    </tr>
+
+                    <tr>
+                        <td>Email</td>
+                        <td id="user-email">&mdash;</td>
+                    </tr>
+
+                    <tr>
+                        <td>Username</td>
+                        <td id="user-username">&mdash;</td>
+                    </tr>
+
+                    <!-- Role is displayed with a colored badge by see CSS -->
+                    <tr>
+                        <td>Role</td>
+                        <td id="user-role">&mdash;</td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+            <!-- Logout button — hits GET /logout on the server -->
+            <a href="/logout" class="btn btn-danger">Sign Out</a>
+
+        </div>
+    </main>
+
+
+    <!-- SITE FOOTER -->
+    <footer class="site-footer">
+        CSC429 Project
+    </footer>
+
+
+    <!-- SCRIPT: Load user data from the server API -->
+    <script>
+        // Call the protected API endpoint that returns session user data
+        fetch('/api/user')
+            .then(function (response) {
+                // The server returns HTTP 401 if the session has expired or
+                // the user is not logged in then redirect to login in that case
+                if (!response.ok) {
+                    window.location.href = '/login';
+                    return null;
+                }
+                return response.json(); // if everything is fine 
+            })
+            .then(function (user) {
+                // Guard: if the response was null (redirect happened) stop here
+                if (!user) return;
+
+                // Populate the welcome message
+                document.getElementById('welcome-msg').textContent =
+                    'Welcome back, ' + user.full_name + '!';
+
+                // Populate the info table cells
+                document.getElementById('user-fullname').textContent = user.full_name;
+                document.getElementById('user-email').textContent = user.email;
+                document.getElementById('user-username').textContent = user.username;
+
+                // Render the role as a styled badge
+                // admin → gold badge   |   user → purple badge
+                var roleEl = document.getElementById('user-role');
+                var roleClass = user.role === 'admin' ? 'role-admin' : 'role-user';
+                roleEl.innerHTML =
+                    '<span class="role-badge ' + roleClass + '">' + user.role + '</span>'; // so admin and user get different styling
+            })
+            .catch(function (err) {
+                // If the network request fails for any reason, send to login
+                console.error('Failed to load user data:', err);
+                window.location.href = '/login';
+            });
+    </script>
+
+</body>
+
+</html>

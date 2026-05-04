@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In — SecureApp</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+    <!-- SITE HEADER -->
+    <header class="site-header">
+        <h1>Secure Login System</h1>
+        <p>CSC429 Project</p>
+    </header>
+
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="card">
+
+            <h2>Welcome Back!</h2>
+            <p class="subtitle">Sign in to your account to continue</p>
+
+            <!-- ALERT CONTAINER: Empty div used to show erorr massages  -->
+            <div id="alert-container"></div>
+
+            <!-- LOGIN FORM -->
+            <form action="/login" method="POST">
+
+                <!-- Username -->
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required
+                        autocomplete="username">
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required
+                        autocomplete="current-password">
+                </div>
+
+                <!-- Submit button -->
+                <button type="submit" class="btn btn-primary">Sign In</button>
+
+            </form>
+
+            <!-- Link to the registration page -->
+            <p class="divider">
+                Don't have an account? <a href="/register">Create one</a>
+            </p>
+
+        </div>
+    </main>
+
+
+    <!-- SITE FOOTER -->
+    <footer class="site-footer">
+        CSC429 Project
+    </footer>
+
+    <!-- Show message from URL (error or success) -->
+    <script>
+        const params = new URLSearchParams(window.location.search); // get the query part from the URL (like ?error=... or ?success=...)
+        const error = params.get('error'); // try to get error message from URL
+        const success = params.get('success'); // try to get success message from URL
+        const container = document.getElementById('alert-container'); // get the div where we will show the message
+
+        if (error) { // if there is an error message
+            // show error inside the container
+            container.innerHTML = `<div class="alert alert-error">${error}</div>`;
+        } else if (success) { // if no error but there is success message
+            // show success message
+            container.innerHTML = `<div class="alert alert-success">${success}</div>`;
+        }
+    </script>
+
+</body>
+
+</html>
