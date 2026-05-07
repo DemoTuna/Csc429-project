@@ -92,7 +92,7 @@ The application initially includes the following vulnerabilities:
 Follow these steps to run the project locally:
 
 1. Download or clone the repository:  
-   git clone <your-repo-url>
+   git clone <https://github.com/DemoTuna/Csc429-project.git>
 
 2. Choose which version of the project you want to see, then open that version folder in your code editor.
 
