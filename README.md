@@ -109,3 +109,81 @@ Follow these steps to run the project locally:
    https://localhost:3000
 
 The application should now be running.
+
+
+## 🧪 How to Test Security Features
+
+### 1. SQL Injection
+
+Before mitigation:
+- Go to the login page.
+- Enter the following payload in the username field:
+
+```sql
+' OR 1=1 --
+```
+
+- Leave the password field empty.
+- The vulnerable version will bypass authentication and grant access.
+
+After mitigation:
+- The same payload will be rejected and the system will display:
+  "Invalid username or password"
+
+---
+
+### 2. Cross-Site Scripting (XSS)
+
+Before mitigation:
+- Go to the comments section.
+- Insert the following payload:
+
+```html
+<img src=x onerror=alert('XSS!')>
+```
+
+- The vulnerable version will execute the alert message when the comment is displayed.
+
+After mitigation:
+- The malicious script will be sanitized and displayed as harmless text.
+
+---
+
+### 3. Access Control
+
+Before mitigation:
+- Login as a normal user.
+- Manually enter:
+
+```text
+/admin
+```
+
+in the browser URL.
+
+- The vulnerable version allows unauthorized access to the admin page.
+
+After mitigation:
+- The system blocks access and displays an "Access Denied" message.
+
+---
+
+### 4. Password Security
+
+Before mitigation:
+- User passwords appear in plain text inside the database.
+
+After mitigation:
+- Passwords are stored securely using bcrypt hashing.
+
+---
+
+### 5. HTTPS & Encryption
+
+- The application runs using HTTPS:
+
+```text
+https://localhost:3000
+```
+
+- Session secrets are stored securely inside a `.env` file instead of hardcoded in the source code.
